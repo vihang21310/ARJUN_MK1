@@ -1,13 +1,17 @@
 #!/usr/bin/env python3.8
 import sys
+import threading
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QWidget
 from PyQt5.QtGui import QPixmap
-from receiver import *
+from feed import *
+from ugv import *
+
 import sqlite3
 
-
+HOST='192.168.0.106'
+PORT=48151
 class WelcomeScreen(QDialog):
     def __init__(self):
         super(WelcomeScreen, self).__init__()
@@ -43,7 +47,8 @@ class LoginScreen(QDialog):
             cur.execute(query)
             result_pass = cur.fetchone()[0]
             if result_pass == password:
-                
+                threading.Thread(target=client.Transmit).start()
+
                 main()
                 
                 
@@ -51,7 +56,7 @@ class LoginScreen(QDialog):
                 self.error.setText("")
             else:
                 self.error.setText("Invalid username or password")
-
+client = Ugv(HOST, PORT)
 app = QApplication(sys.argv)
 welcome = WelcomeScreen()
 widget = QtWidgets.QStackedWidget()
